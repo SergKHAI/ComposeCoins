@@ -4,15 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,7 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import co.composecoins.R
 import co.composecoins.presentation.ui.navigation.BottomNavigationItem
 import co.composecoins.presentation.ui.navigation.NavItem
-import co.composecoins.presentation.ui.screens.ProfileScreen
+import co.composecoins.presentation.ui.screens.profile.FavoritesScreen
 import co.composecoins.presentation.ui.screens.detail.DetailScreen
 import co.composecoins.presentation.ui.screens.home.HomeScreen
 import co.composecoins.presentation.ui.theme.ComposeCoinsTheme
@@ -47,28 +48,27 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val navController = rememberNavController()
     Scaffold(
-        topBar = { TopBar() },
         bottomBar = { BottomNavigationBar(navController) }
     ) {
-        Navigation(navController)
+        Navigation(navController, it.calculateBottomPadding())
     }
 }
 
 @ExperimentalMaterialApi
 @Composable
-fun Navigation(navController: NavHostController) {
+fun Navigation(navController: NavHostController, bottomPadding: Dp) {
     val selectedId = remember {
         mutableStateOf("")
     }
-    NavHost(navController, startDestination = BottomNavigationItem.Home.route) {
+    NavHost(navController, startDestination = BottomNavigationItem.Home.route, modifier = Modifier.padding(bottom = bottomPadding)) {
         composable(BottomNavigationItem.Home.route) {
             HomeScreen(onSelectId = {
                 selectedId.value = it
                 navController.navigate(NavItem.Detail.route)
             })
         }
-        composable(BottomNavigationItem.Profile.route) {
-            ProfileScreen()
+        composable(BottomNavigationItem.Favorites.route) {
+            FavoritesScreen()
         }
         composable(NavItem.Detail.route) {
             DetailScreen(selectedId.value)
@@ -77,19 +77,10 @@ fun Navigation(navController: NavHostController) {
 }
 
 @Composable
-fun TopBar() {
-    TopAppBar(
-        title = { Text(text = stringResource(R.string.app_name), fontSize = 18.sp) },
-        backgroundColor = colorResource(id = R.color.black),
-        contentColor = Color.White
-    )
-}
-
-@Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         BottomNavigationItem.Home,
-        BottomNavigationItem.Profile
+        BottomNavigationItem.Favorites
     )
     val checkedButton = remember { mutableStateOf(0) }
 

@@ -1,13 +1,15 @@
 package co.composecoins.data.providers.network
 
 import co.composecoins.domain.models.responces.gecko.CoinEntity
+import co.composecoins.domain.models.responces.gecko.CoinMarketEntity
 import co.composecoins.domain.models.responces.gecko.toEntity
 import drewcarlson.coingecko.CoinGeckoClient
 import drewcarlson.coingecko.models.coins.CoinFullData
+import drewcarlson.coingecko.models.coins.CoinMarkets
+import drewcarlson.coingecko.models.coins.CoinMarketsList
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class NetworkDataProvider @Inject constructor(private val coinGeckoClient: CoinGeckoClient) {
     suspend fun getCoins() : List<CoinEntity>? {
         return try {
@@ -24,4 +26,13 @@ class NetworkDataProvider @Inject constructor(private val coinGeckoClient: CoinG
             null
         }
     }
+
+    suspend fun getMarketCoinInfo(id: String): CoinMarketsList? {
+        return try {
+            coinGeckoClient.getCoinMarkets("usd", id)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 }
